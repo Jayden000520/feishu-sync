@@ -18,13 +18,15 @@ jobs:
 
       # 用仓库 Secrets 生成临时 caldav2ics.yaml
       - name: Create config file
-        run: |
-          cat > caldav2ics.yaml <<EOF
-          - url: "${{ secrets.CAL_URL }}${{ secrets.CAL_PATH }}"
-            user: "${{ secrets.CAL_USER }}"
-            pass: "${{ secrets.CAL_PASS }}"
-            file: "feishu.ics"
-          EOF
+  run: |
+    cat > caldav2ics.yaml <<EOF
+    calendars:
+      - url: "${{ secrets.CAL_URL }}${{ secrets.CAL_PATH }}"
+        user: "${{ secrets.CAL_USER }}"
+        pass: "${{ secrets.CAL_PASS }}"
+        file: "feishu.ics"
+    EOF
+
 
       - name: Run caldav2ics.php
         run: php caldav2ics.php
