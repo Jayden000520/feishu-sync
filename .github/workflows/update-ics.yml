@@ -1,0 +1,37 @@
+name: Build & Publish Feishu ICS
+
+on:
+  workflow_dispatch:           # 手动触发
+  schedule:
+    - cron: '*/30 * * * *'     # 每 30 分钟自动跑一次
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PHP (for caldav2ics)
+        run: sudo apt-get update && sudo apt-get install -y php-cli php-curl
+
+      # 用仓库 Secrets 生成临时 caldav2ics.yaml
+      - name: Create config file
+        run: |
+          cat > caldav2ics.yaml <<EOF
+          - url: "${{ secrets.CAL_URL }}${{ secrets.CAL_PATH }}"
+            user: "${{ secrets.CAL_USER }}"
+            pass: "${{ secrets.CAL_PASS }}"
+            file: "feishu.ics"
+          EOF
+
+      - name: Run caldav2ics.php
+        run: php caldav2ics.php
+
+      # 把生成的 feishu.ics 推回 main 分支
+      - name: Commit & push
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "feishu.ics"
+          message: "chore: update Feishu ICS"
