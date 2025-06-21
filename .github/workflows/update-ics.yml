@@ -17,14 +17,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y php-cli php-curl
-      - name: Discover CAL_PATH   # 👈 临时探路
-        id: discover
+      - name: Discover CAL_PATH   # 临时探路（含状态码）
         run: |
           echo "🔍 Probing Feishu CalDAV root ..."
           curl -u "${{ secrets.CAL_USER }}:${{ secrets.CAL_PASS }}" \
+               -I https://caldav.feishu.cn/calendars/ || true   # -I 只取响应头
+          echo "—— 正文预览 ——"
+          curl -u "${{ secrets.CAL_USER }}:${{ secrets.CAL_PASS }}" \
                -X PROPFIND -H "Depth: 1" -H "Content-Type: application/xml" \
-               https://caldav.feishu.cn/calendars/ 2>/dev/null | \
-               grep -o '/calendars/[^/]\+/' | head -n 1 | tee calpath.txt
+               https://caldav.feishu.cn/calendars/ \
+               | head -n 40
       - name: Create config file
         run: |
           cat > caldav2ics.yaml <<EOF
