@@ -31,11 +31,13 @@ jobs:
         run: |
           cat > caldav2ics.yaml <<EOF
           calendars:
-            - url: "${{ secrets.CAL_URL }}${{ secrets.CAL_PATH }}"
-              user: "${{ secrets.CAL_USER }}"
-              pass: "${{ secrets.CAL_PASS }}"
-              file: "feishu.ics"
+            - Name: Feishu
+              Url: "${{ secrets.CAL_URL }}${{ secrets.CAL_PATH }}"
+              User: "${{ secrets.CAL_USER }}"
+              Pass: "${{ secrets.CAL_PASS }}"
+              File: "feishu.ics"
           EOF
+
 
       - name: Run caldav2ics
         run: php caldav2ics.php
